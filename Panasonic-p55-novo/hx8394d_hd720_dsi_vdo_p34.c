@@ -1,9 +1,105 @@
-void lcm_set_util_funcs_(LCM_UTIL_FUNCS *utils)
+/*****************************************************************************
+*  Copyright Statement:
+*  --------------------
+*  This software is protected by Copyright and the information contained
+*  herein is confidential. The software may not be copied and the information
+*  contained herein may not be used or disclosed except with the written
+*  permission of MediaTek Inc. (C) 2008
+*
+*  BY OPENING THIS FILE, BUYER HEREBY UNEQUIVOCALLY ACKNOWLEDGES AND AGREES
+*  THAT THE SOFTWARE/FIRMWARE AND ITS DOCUMENTATIONS ("MEDIATEK SOFTWARE")
+*  RECEIVED FROM MEDIATEK AND/OR ITS REPRESENTATIVES ARE PROVIDED TO BUYER ON
+*  AN "AS-IS" BASIS ONLY. MEDIATEK EXPRESSLY DISCLAIMS ANY AND ALL WARRANTIES,
+*  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF
+*  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
+*  NEITHER DOES MEDIATEK PROVIDE ANY WARRANTY WHATSOEVER WITH RESPECT TO THE
+*  SOFTWARE OF ANY THIRD PARTY WHICH MAY BE USED BY, INCORPORATED IN, OR
+*  SUPPLIED WITH THE MEDIATEK SOFTWARE, AND BUYER AGREES TO LOOK ONLY TO SUCH
+*  THIRD PARTY FOR ANY WARRANTY CLAIM RELATING THERETO. MEDIATEK SHALL ALSO
+*  NOT BE RESPONSIBLE FOR ANY MEDIATEK SOFTWARE RELEASES MADE TO BUYER'S
+*  SPECIFICATION OR TO CONFORM TO A PARTICULAR STANDARD OR OPEN FORUM.
+*
+*  BUYER'S SOLE AND EXCLUSIVE REMEDY AND MEDIATEK'S ENTIRE AND CUMULATIVE
+*  LIABILITY WITH RESPECT TO THE MEDIATEK SOFTWARE RELEASED HEREUNDER WILL BE,
+*  AT MEDIATEK'S OPTION, TO REVISE OR REPLACE THE MEDIATEK SOFTWARE AT ISSUE,
+*  OR REFUND ANY SOFTWARE LICENSE FEES OR SERVICE CHARGE PAID BY BUYER TO
+*  MEDIATEK FOR SUCH MEDIATEK SOFTWARE AT ISSUE.
+*
+*  THE TRANSACTION CONTEMPLATED HEREUNDER SHALL BE CONSTRUED IN ACCORDANCE
+*  WITH THE LAWS OF THE STATE OF CALIFORNIA, USA, EXCLUDING ITS CONFLICT OF
+*  LAWS PRINCIPLES.  ANY DISPUTES, CONTROVERSIES OR CLAIMS ARISING THEREOF AND
+*  RELATED THERETO SHALL BE SETTLED BY ARBITRATION IN SAN FRANCISCO, CA, UNDER
+*  THE RULES OF THE INTERNATIONAL CHAMBER OF COMMERCE (ICC).
+*
+*****************************************************************************/
+
+#ifndef BUILD_LK
+#include <linux/string.h>
+#endif
+#include "lcm_drv.h"
+
+#ifdef BUILD_LK
+#include <platform/mt_gpio.h>
+#include <platform/mt_pmic.h>
+#elif defined(BUILD_UBOOT)
+#include <asm/arch/mt_gpio.h>
+#else
+#include <mach/mt_gpio.h>
+#include <linux/xlog.h>
+#include <mach/mt_pm_ldo.h>
+#endif
+
+// ---------------------------------------------------------------------------
+//  Local Constants
+// ---------------------------------------------------------------------------
+
+#define FRAME_WIDTH                                         (720)
+#define FRAME_HEIGHT                                        (1280)
+
+#define REGFLAG_DELAY                                       0xFE
+#define REGFLAG_END_OF_TABLE                                0xFF   // END OF REGISTERS MARKER
+
+#define LCM_DSI_CMD_MODE                                    0
+
+#define LCM_ID_HX8394D                                     0x94
+#define GPIO_LCD_RST_EN      GPIO131
+
+// ---------------------------------------------------------------------------
+//  Local Variables
+// ---------------------------------------------------------------------------
+
+static LCM_UTIL_FUNCS lcm_util = {0};
+
+#define SET_RESET_PIN(v)    (lcm_util.set_reset_pin((v)))
+
+#define UDELAY(n) (lcm_util.udelay(n))
+#define MDELAY(n) (lcm_util.mdelay(n))
+
+     //unsigned int tmp=0x50;
+// ---------------------------------------------------------------------------
+//  Local Functions
+// ---------------------------------------------------------------------------
+
+#define dsi_set_cmdq_V2(cmd, count, ppara, force_update)    lcm_util.dsi_set_cmdq_V2(cmd, count, ppara, force_update)
+#define dsi_set_cmdq(pdata, queue_size, force_update)       lcm_util.dsi_set_cmdq(pdata, queue_size, force_update)
+#define wrtie_cmd(cmd)                                  lcm_util.dsi_write_cmd(cmd)
+#define write_regs(addr, pdata, byte_nums)              lcm_util.dsi_write_regs(addr, pdata, byte_nums)
+#define read_reg                                            lcm_util.dsi_read_reg()
+#define read_reg_v2(cmd, buffer, buffer_size)               lcm_util.dsi_dcs_read_lcm_reg_v2(cmd, buffer, buffer_size)
+
+
+static struct LCM_setting_table {
+    unsigned cmd;
+    unsigned char count;
+    unsigned char para_list[128];
+};
+
+static void lcm_set_util_funcs_(LCM_UTIL_FUNCS *utils)
 {
   memcpy_(&g_LCM_UTIL_FUNCS, utils, 0x50);
 }
 
-void lcm_get_params_(LCM_PARAMS *params)
+static void lcm_get_params_(LCM_PARAMS *params)
 {
   _memzero_(params, 0x220);
   params->type = 2;
@@ -25,7 +121,7 @@ void lcm_get_params_(LCM_PARAMS *params)
   params->dsi.ssc_disable = 1;
 }
 
-void lcm_init_()
+static void lcm_init_()
 {
   int data_array[16]; // [sp+0h] [bp-64h]
 
@@ -153,7 +249,7 @@ void lcm_init_()
   mdelay(20);
 }
 
-void lcm_suspend_()
+static void lcm_suspend_()
 {
   int buff[16]; // [sp+0h] [bp-54h]
 
@@ -171,13 +267,13 @@ void lcm_suspend_()
   mdelay(120);
 }
 
-void lcm_resume_()
+static void lcm_resume_()
 {
   lcm_init_();
   printk("[KERNEL]---cmd---hx8394a_hd720_dsi_vdo_tianma----%s------\n", 0xC0768474);// ROM:C0768474 aLcmResume      DCB "lcm_resume",0
 }
 
-bool lcm_compare_id_()
+static unsigned int lcm_compare_id_()
 {
   bool result; // r0
   char buff_2[3]; // [sp+5h] [bp-57h]
@@ -207,7 +303,7 @@ bool lcm_compare_id_()
   return result;
 }
 
-int lcm_esd_check_()
+static unsigned int int lcm_esd_check_()
 {
   int result; // r0
   unsigned __int8 buff_3; // [sp+2h] [bp-2Ah]
@@ -237,10 +333,25 @@ int lcm_esd_check_()
   return result;
 }
 
-signed int lcm_esd_recover_()
+static unsigned int lcm_esd_recover_()
 {
   printk("miles---> [FUNC]:%s [LINE]:%d\n", "lcm_esd_recover", 725);
   lcm_resume_();
   return 1;
 }
 
+
+// ---------------------------------------------------------------------------
+//  Get LCM Driver Hooks
+// ---------------------------------------------------------------------------
+
+LCM_DRIVER hx8394d_hd720_dsi_vdo_s35_lcm_drv =
+{
+	.name           = "hx8394d_hd720_dsi_vdo_s35",
+	.set_util_funcs = lcm_set_util_funcs,
+	.get_params     = lcm_get_params,
+	.init           = lcm_init,
+	.suspend        = lcm_suspend,
+	.resume         = lcm_resume,
+	.compare_id     = lcm_compare_id,
+};
