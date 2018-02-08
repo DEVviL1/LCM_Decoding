@@ -39,14 +39,11 @@
 #include "lcm_drv.h"
 
 #ifdef BUILD_LK
-#include <platform/mt_gpio.h>
-#include <platform/mt_pmic.h>
+	#include <platform/mt_gpio.h>
 #elif defined(BUILD_UBOOT)
-#include <asm/arch/mt_gpio.h>
+	#include <asm/arch/mt_gpio.h>
 #else
-#include <mach/mt_gpio.h>
-#include <linux/xlog.h>
-#include <mach/mt_pm_ldo.h>
+	#include <mach/mt_gpio.h>
 #endif
 
 // ---------------------------------------------------------------------------
@@ -56,43 +53,27 @@
 #define FRAME_WIDTH                                         (720)
 #define FRAME_HEIGHT                                        (1280)
 
-#define REGFLAG_DELAY                                       0xFE
-#define REGFLAG_END_OF_TABLE                                0xFF   // END OF REGISTERS MARKER
-
-#define LCM_DSI_CMD_MODE                                    0
-
-#define LCM_ID_HX8394D                                     0x94
-#define GPIO_LCD_RST_EN      GPIO131
-
 // ---------------------------------------------------------------------------
 //  Local Variables
 // ---------------------------------------------------------------------------
 
 static LCM_UTIL_FUNCS lcm_util = {0};
 
-#define SET_RESET_PIN(v)    (lcm_util.set_reset_pin((v)))
+#define SET_RESET_PIN(v)    								(lcm_util.set_reset_pin((v)))
 
-#define UDELAY(n) (lcm_util.udelay(n))
-#define MDELAY(n) (lcm_util.mdelay(n))
+#define UDELAY(n) 											(lcm_util.udelay(n))
+#define MDELAY(n)
 
-     //unsigned int tmp=0x50;
 // ---------------------------------------------------------------------------
 //  Local Functions
 // ---------------------------------------------------------------------------
 
-#define dsi_set_cmdq_V2(cmd, count, ppara, force_update)    lcm_util.dsi_set_cmdq_V2(cmd, count, ppara, force_update)
-#define dsi_set_cmdq(pdata, queue_size, force_update)       lcm_util.dsi_set_cmdq(pdata, queue_size, force_update)
-#define wrtie_cmd(cmd)                                  lcm_util.dsi_write_cmd(cmd)
-#define write_regs(addr, pdata, byte_nums)              lcm_util.dsi_write_regs(addr, pdata, byte_nums)
-#define read_reg                                            lcm_util.dsi_read_reg()
-#define read_reg_v2(cmd, buffer, buffer_size)               lcm_util.dsi_dcs_read_lcm_reg_v2(cmd, buffer, buffer_size)
-
-
-static struct LCM_setting_table {
-    unsigned cmd;
-    unsigned char count;
-    unsigned char para_list[128];
-};
+#define dsi_set_cmdq_V2(cmd, count, ppara, force_update)	        lcm_util.dsi_set_cmdq_V2(cmd, count, ppara, force_update)
+#define dsi_set_cmdq(pdata, queue_size, force_update)		lcm_util.dsi_set_cmdq(pdata, queue_size, force_update)
+#define wrtie_cmd(cmd)										lcm_util.dsi_write_cmd(cmd)
+#define write_regs(addr, pdata, byte_nums)					lcm_util.dsi_write_regs(addr, pdata, byte_nums)
+#define read_reg(cmd)											lcm_util.dsi_dcs_read_lcm_reg(cmd)
+#define read_reg_v2(cmd, buffer, buffer_size)
 
 static void lcm_set_util_funcs_(LCM_UTIL_FUNCS *utils)
 {
@@ -275,32 +256,7 @@ static void lcm_resume_()
 
 static unsigned int lcm_compare_id_()
 {
-  bool result; // r0
-  char buff_2[3]; // [sp+5h] [bp-57h]
-  int buff[16]; // [sp+8h] [bp-54h]
-
-  set_reset_pin(1u);
-  mdelay(10);
-  set_reset_pin(0);
-  mdelay(10);
-  set_reset_pin(1u);
-  mdelay(20);
-  buff[0] = 0x43902;
-  buff[1] = 0x9483FFB9;
-  dsi_set_cmdq(buff, 2, 1);
-  mdelay(10);
-  buff[0] = 0x33902;
-  buff[1] = 0x8373BA;
-  dsi_set_cmdq(buff, 2, 1);
-  mdelay(5);
-  buff[0] = 0x33700;
-  dsi_set_cmdq(buff, 1, 1);
-  (dsi_dcs_read_lcm_reg_v2)(4, buff_2, 3);
-  if ( buff_2[0] == 0x83 )
-    result = buff_2[1] - 0x94 <= 0;
-  else
-    result = 0;
-  return result;
+  return 1;
 }
 
 static unsigned int lcm_esd_check_()
