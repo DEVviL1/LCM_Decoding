@@ -303,7 +303,7 @@ static unsigned int lcm_compare_id_()
   return result;
 }
 
-static unsigned int int lcm_esd_check_()
+static unsigned int lcm_esd_check_()
 {
   int result; // r0
   unsigned __int8 buff_3; // [sp+2h] [bp-2Ah]
