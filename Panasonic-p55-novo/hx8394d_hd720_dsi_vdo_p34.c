@@ -62,7 +62,7 @@ static LCM_UTIL_FUNCS lcm_util = {0};
 #define SET_RESET_PIN(v)    								(lcm_util.set_reset_pin((v)))
 
 #define UDELAY(n) 											(lcm_util.udelay(n))
-#define MDELAY(n)
+#define MDELAY(n)                                           (lcm_util.mdelay(n))
 
 // ---------------------------------------------------------------------------
 //  Local Functions
