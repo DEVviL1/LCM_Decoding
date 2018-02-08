@@ -301,9 +301,9 @@ static unsigned int lcm_esd_recover_()
 //  Get LCM Driver Hooks
 // ---------------------------------------------------------------------------
 
-LCM_DRIVER hx8394d_hd720_dsi_vdo_s35_lcm_drv =
+LCM_DRIVER hx8394d_hd720_dsi_vdo_p34_lcm_drv =
 {
-	.name           = "hx8394d_hd720_dsi_vdo_s35",
+	.name           = "hx8394d_hd720_dsi_vdo_p34",
 	.set_util_funcs = lcm_set_util_funcs,
 	.get_params     = lcm_get_params,
 	.init           = lcm_init,
