@@ -195,7 +195,6 @@ static void lcm_init(void)
 {
   SET_RESET_PIN(0);
   MDELAY(20);
-
   SET_RESET_PIN(1);
   MDELAY(20);
 
@@ -229,6 +228,11 @@ static unsigned int lcm_compare_id(void)
 {
   return 1;
 };
+
+
+// ---------------------------------------------------------------------------
+//  Get LCM Driver Hooks
+// ---------------------------------------------------------------------------
 
 LCM_DRIVER otm1283a_hd720_dsi_vdo_tcl_lcm_drv =
 {
