@@ -11,6 +11,11 @@
 	#include <mach/mt_gpio.h>
 #endif
 
+#define LCM_DSI_CMD_MODE									0
+
+#define FRAME_WIDTH  										(720)
+#define FRAME_HEIGHT 										(1280)
+
 static LCM_UTIL_FUNCS lcm_util = {0};
 
 #define SET_RESET_PIN(v)    								(lcm_util.set_reset_pin((v)))
@@ -178,20 +183,20 @@ static void lcm_get_params(LCM_PARAMS * params)
   params->dsi.horizontal_backporch = 34;
   params->dsi.horizontal_frontporch = 24;
   params->dsi.PLL_CLOCK = 185;
-  params->type = 2;
+  params->type = LCM_TYPE_DSI;
   params->dsi.data_format.format = 2;
   params->dsi.PS = 2;
-  params->width = 720;
-  params->dsi.horizontal_active_pixel = 720;
-  params->height = 1280;
-  params->dsi.vertical_active_line = 1280;
+  params->width = FRAME_WIDTH;
+  params->dsi.horizontal_active_pixel = FRAME_WIDTH;
+  params->height = FRAME_HEIGTH;
+  params->dsi.vertical_active_line = FRAME_HEIGTH;
   params->dbi.te_mode = 1;
-  params->dsi.mode = 1;
-  params->dsi.LANE_NUM = 4;
+  params->dsi.mode = CMD_MODE;
+  params->dsi.LANE_NUM = LCM_FOUR_LANE;
   params->dsi.horizontal_sync_active = 4;
   params->dsi.packet_size = 256;
   params->dsi.intermediat_buffer_num = 0;
-  params->dsi.word_count = 720 * 3;
+  params->dsi.word_count=720*3;
 };
 
 static void lcm_init(void)
