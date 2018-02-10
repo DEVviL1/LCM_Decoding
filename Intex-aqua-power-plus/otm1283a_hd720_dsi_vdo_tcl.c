@@ -189,6 +189,9 @@ static void lcm_get_params(LCM_PARAMS * params)
   params->dsi.mode = 1;
   params->dsi.LANE_NUM = 4;
   params->dsi.horizontal_sync_active = 4;
+  params->dsi.packet_size = 256;
+  params->dsi.intermediat_buffer_num = 0;
+  params->dsi.word_count = 720 * 3;
 };
 
 static void lcm_init(void)
