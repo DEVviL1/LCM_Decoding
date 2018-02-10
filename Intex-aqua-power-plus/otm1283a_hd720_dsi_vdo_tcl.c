@@ -188,8 +188,8 @@ static void lcm_get_params(LCM_PARAMS * params)
   params->dsi.PS = 2;
   params->width = FRAME_WIDTH;
   params->dsi.horizontal_active_pixel = FRAME_WIDTH;
-  params->height = FRAME_HEIGTH;
-  params->dsi.vertical_active_line = FRAME_HEIGTH;
+  params->height = FRAME_HEIGHT;
+  params->dsi.vertical_active_line = FRAME_HEIGHT;
   params->dbi.te_mode = 1;
   params->dsi.mode = 1;
   params->dsi.LANE_NUM = LCM_FOUR_LANE;
