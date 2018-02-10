@@ -183,7 +183,7 @@ static void lcm_get_params(LCM_PARAMS * params)
   params->dsi.horizontal_backporch = 34;
   params->dsi.horizontal_frontporch = 24;
   params->dsi.PLL_CLOCK = 185;
-  params->type = LCM_TYPE_DSI;
+  params->type = 2;
   params->dsi.data_format.format = 2;
   params->dsi.PS = 2;
   params->width = FRAME_WIDTH;
@@ -191,12 +191,15 @@ static void lcm_get_params(LCM_PARAMS * params)
   params->height = FRAME_HEIGTH;
   params->dsi.vertical_active_line = FRAME_HEIGTH;
   params->dbi.te_mode = 1;
-  params->dsi.mode = CMD_MODE;
+  params->dsi.mode = 1;
   params->dsi.LANE_NUM = LCM_FOUR_LANE;
   params->dsi.horizontal_sync_active = 4;
   params->dsi.packet_size = 256;
   params->dsi.intermediat_buffer_num = 0;
   params->dsi.word_count=720*3;
+  params->dsi.data_format.color_order = LCM_COLOR_ORDER_RGB;
+  params->dsi.data_format.trans_seq   = LCM_DSI_TRANS_SEQ_MSB_FIRST;
+  params->dsi.data_format.padding     = LCM_DSI_PADDING_ON_LSB;
 };
 
 static void lcm_init(void)
